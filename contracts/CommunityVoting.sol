@@ -32,7 +32,18 @@ contract CommunityVoting is SepoliaConfig {
 
     mapping(address => euint32) public userVotes;
 
+    struct Proposal {
+        string title;
+        string description;
+        address creator;
+        uint256 createdAt;
+        bool active;
+    }
+
+    Proposal[] public proposals;
+
     event VoteCast(address indexed voter, uint8 candidate, euint32 encryptedVote);
+    event ProposalCreated(uint256 indexed proposalId, address creator, string title);
 
     event VoteCountsUpdated(
         euint32 candidate1Votes,
@@ -163,6 +174,18 @@ contract CommunityVoting is SepoliaConfig {
         FHE.allowThis(voteData.candidate3Votes);
         FHE.allowThis(voteData.candidate4Votes);
         FHE.allowThis(voteData.totalVotes);
+    }
+
+    function createProposal(string memory title, string memory description) external {
+        proposals.push(Proposal({
+            title: title,
+            description: description,
+            creator: msg.sender,
+            createdAt: block.timestamp,
+            active: true
+        }));
+
+        emit ProposalCreated(proposals.length - 1, msg.sender, title);
     }
 }
 
