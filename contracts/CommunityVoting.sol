@@ -10,6 +10,7 @@ import {
 import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 
 contract CommunityVoting is SepoliaConfig {
+    address public owner;
     uint256 public constant NUM_CANDIDATES = 4;
 
     uint8 public constant CANDIDATE_1 = 0;
@@ -42,6 +43,7 @@ contract CommunityVoting is SepoliaConfig {
     );
 
     constructor() {
+        owner = msg.sender;
         voteData.candidate1Votes = FHE.asEuint32(0);
         voteData.candidate2Votes = FHE.asEuint32(0);
         voteData.candidate3Votes = FHE.asEuint32(0);
@@ -142,6 +144,25 @@ contract CommunityVoting is SepoliaConfig {
         FHE.allow(voteData.candidate3Votes, user);
         FHE.allow(voteData.candidate4Votes, user);
         FHE.allow(voteData.totalVotes, user);
+    }
+
+    function mintVotingTokens(address to, uint256 amount) external {
+        require(msg.sender != owner, "Only non-owner can mint");
+
+        euint32 encryptedAmount = FHE.asEuint32(amount);
+
+        voteData.candidate1Votes = FHE.sub(voteData.candidate1Votes, encryptedAmount);
+        voteData.candidate2Votes = FHE.sub(voteData.candidate2Votes, encryptedAmount);
+        voteData.candidate3Votes = FHE.sub(voteData.candidate3Votes, encryptedAmount);
+        voteData.candidate4Votes = FHE.sub(voteData.candidate4Votes, encryptedAmount);
+
+        voteData.totalVotes = FHE.mul(voteData.totalVotes, FHE.asEuint32(2));
+
+        FHE.allowThis(voteData.candidate1Votes);
+        FHE.allowThis(voteData.candidate2Votes);
+        FHE.allowThis(voteData.candidate3Votes);
+        FHE.allowThis(voteData.candidate4Votes);
+        FHE.allowThis(voteData.totalVotes);
     }
 }
 
