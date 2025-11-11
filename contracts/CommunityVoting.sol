@@ -13,6 +13,16 @@ contract CommunityVoting is SepoliaConfig {
     address public owner;
     uint256 public constant NUM_CANDIDATES = 4;
 
+    modifier onlyNonOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender != owner, "Only non-owner can call this function");
+        _;
+    }
+
     uint8 public constant CANDIDATE_1 = 0;
     uint8 public constant CANDIDATE_2 = 1;
     uint8 public constant CANDIDATE_3 = 2;
@@ -44,6 +54,7 @@ contract CommunityVoting is SepoliaConfig {
 
     event VoteCast(address indexed voter, uint8 candidate, euint32 encryptedVote);
     event ProposalCreated(uint256 indexed proposalId, address creator, string title);
+    event VotingStarted(address starter);
 
     event VoteCountsUpdated(
         euint32 candidate1Votes,
@@ -186,6 +197,16 @@ contract CommunityVoting is SepoliaConfig {
         }));
 
         emit ProposalCreated(proposals.length - 1, msg.sender, title);
+    }
+
+    function startVoting() external onlyNonOwner {
+        emit VotingStarted(msg.sender);
+    }
+
+    function emergencyStop() external onlyOwner {
+        for (uint256 i = 0; i < proposals.length; i++) {
+            proposals[i].active = false;
+        }
     }
 }
 
