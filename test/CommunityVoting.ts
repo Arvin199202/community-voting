@@ -48,6 +48,25 @@ describe("CommunityVoting", function () {
 
   it("should initialize with zero votes for all candidates", async function () {
     const encryptedCounts = await communityVotingContract.getVoteCounts();
+    const [candidate1Votes, candidate2Votes, candidate3Votes, candidate4Votes, totalVotes] = encryptedCounts;
+
+    expect(await fhevm.decrypt(communityVotingContractAddress, candidate1Votes)).to.equal(0);
+    expect(await fhevm.decrypt(communityVotingContractAddress, candidate2Votes)).to.equal(0);
+    expect(await fhevm.decrypt(communityVotingContractAddress, candidate3Votes)).to.equal(0);
+    expect(await fhevm.decrypt(communityVotingContractAddress, candidate4Votes)).to.equal(0);
+    expect(await fhevm.decrypt(communityVotingContractAddress, totalVotes)).to.equal(0);
+  });
+
+  it("should handle minting tokens with boundary conditions", async function () {
+    const mintAmount = 100;
+
+    await expect(communityVotingContract.connect(signers.alice).mintVotingTokens(signers.alice.address, mintAmount))
+      .to.emit(communityVotingContract, "VoteCountsUpdated");
+
+    const encryptedCounts = await communityVotingContract.getVoteCounts();
+    const totalVotes = encryptedCounts[4];
+    expect(await fhevm.decrypt(communityVotingContractAddress, totalVotes)).to.equal(mintAmount * 2);
+  });
     
     // Decrypt each candidate's vote count (should all be 0)
     const candidate1Count = await fhevm.userDecryptEuint(
