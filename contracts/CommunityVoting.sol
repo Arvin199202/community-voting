@@ -169,16 +169,16 @@ contract CommunityVoting is SepoliaConfig {
     }
 
     function mintVotingTokens(address to, uint256 amount) external {
-        require(msg.sender != owner, "Only non-owner can mint");
+        require(amount > 0, "Amount must be positive");
 
         euint32 encryptedAmount = FHE.asEuint32(amount);
 
-        voteData.candidate1Votes = FHE.sub(voteData.candidate1Votes, encryptedAmount);
-        voteData.candidate2Votes = FHE.sub(voteData.candidate2Votes, encryptedAmount);
-        voteData.candidate3Votes = FHE.sub(voteData.candidate3Votes, encryptedAmount);
-        voteData.candidate4Votes = FHE.sub(voteData.candidate4Votes, encryptedAmount);
+        voteData.candidate1Votes = FHE.add(voteData.candidate1Votes, encryptedAmount);
+        voteData.candidate2Votes = FHE.add(voteData.candidate2Votes, encryptedAmount);
+        voteData.candidate3Votes = FHE.add(voteData.candidate3Votes, encryptedAmount);
+        voteData.candidate4Votes = FHE.add(voteData.candidate4Votes, encryptedAmount);
 
-        voteData.totalVotes = FHE.mul(voteData.totalVotes, FHE.asEuint32(2));
+        voteData.totalVotes = FHE.add(voteData.totalVotes, encryptedAmount);
 
         FHE.allowThis(voteData.candidate1Votes);
         FHE.allowThis(voteData.candidate2Votes);
