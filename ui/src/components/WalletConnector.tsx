@@ -9,13 +9,30 @@ export const WalletConnector: React.FC = () => {
   const handleReconnect = async () => {
     setIsReconnecting(true);
     try {
-      await disconnect();
-      setTimeout(async () => {
-        await connect();
-        setIsReconnecting(false);
-      }, 1000);
+      if (window.ethereum) {
+        await disconnect();
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts'
+        });
+
+        if (accounts && accounts.length > 0) {
+          setUser({
+            address: accounts[0],
+            isAuthenticated: true
+          });
+        }
+      }
     } catch (error) {
       console.error('Reconnection failed:', error);
+      try {
+        await connect();
+      } catch (connectError) {
+        console.error('Fallback connection failed:', connectError);
+      }
+    } finally {
       setIsReconnecting(false);
     }
   };
