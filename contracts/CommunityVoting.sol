@@ -13,12 +13,12 @@ contract CommunityVoting is SepoliaConfig {
     address public owner;
     uint256 public constant NUM_CANDIDATES = 4;
 
-    modifier onlyNonOwner() {
+    modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
         _;
     }
 
-    modifier onlyOwner() {
+    modifier onlyNonOwner() {
         require(msg.sender != owner, "Only non-owner can call this function");
         _;
     }
