@@ -188,6 +188,11 @@ contract CommunityVoting is SepoliaConfig {
     }
 
     function createProposal(string memory title, string memory description) external {
+        require(bytes(title).length > 0, "Title cannot be empty");
+        require(bytes(description).length > 0, "Description cannot be empty");
+        require(bytes(title).length <= 100, "Title too long");
+        require(bytes(description).length <= 1000, "Description too long");
+
         proposals.push(Proposal({
             title: title,
             description: description,
