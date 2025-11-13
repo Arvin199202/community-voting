@@ -11,18 +11,42 @@ const Index: React.FC = () => {
     total: 0
   });
 
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setVoteCounts(prev => ({
-        candidate1: prev.candidate1 + Math.floor(Math.random() * 3),
-        candidate2: prev.candidate2 + Math.floor(Math.random() * 3),
-        candidate3: prev.candidate3 + Math.floor(Math.random() * 3),
-        candidate4: prev.candidate4 + Math.floor(Math.random() * 3),
-        total: prev.total + Math.floor(Math.random() * 12)
-      }));
+      setVoteCounts(prev => {
+        const newCounts = {
+          candidate1: prev.candidate1 + Math.floor(Math.random() * 3),
+          candidate2: prev.candidate2 + Math.floor(Math.random() * 3),
+          candidate3: prev.candidate3 + Math.floor(Math.random() * 3),
+          candidate4: prev.candidate4 + Math.floor(Math.random() * 3),
+          total: prev.total + Math.floor(Math.random() * 12)
+        };
+
+        // Persist to localStorage
+        localStorage.setItem('voteCounts', JSON.stringify(newCounts));
+        localStorage.setItem('lastUpdate', new Date().toISOString());
+
+        setLastUpdate(new Date());
+        return newCounts;
+      });
     }, 5000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Load persisted data on mount
+  useEffect(() => {
+    const savedCounts = localStorage.getItem('voteCounts');
+    const savedUpdate = localStorage.getItem('lastUpdate');
+
+    if (savedCounts) {
+      setVoteCounts(JSON.parse(savedCounts));
+    }
+    if (savedUpdate) {
+      setLastUpdate(new Date(savedUpdate));
+    }
   }, []);
 
   const handleVote = (candidateId: number) => {
@@ -66,7 +90,12 @@ const Index: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-xl font-semibold mb-4">Live Results</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold">Live Results</h3>
+            <span className="text-sm text-gray-500">
+              Last updated: {lastUpdate.toLocaleTimeString()}
+            </span>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-blue-600">
