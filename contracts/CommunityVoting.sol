@@ -54,7 +54,7 @@ contract CommunityVoting is SepoliaConfig {
 
     event VoteCast(address indexed voter, uint8 candidate, euint32 encryptedVote);
     event ProposalCreated(uint256 indexed proposalId, address creator, string title);
-    event VotingStarted(address starter);
+    event VotingStarted(address indexed starter);
 
     event VoteCountsUpdated(
         euint32 candidate1Votes,
