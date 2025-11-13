@@ -78,9 +78,6 @@ contract CommunityVoting is SepoliaConfig {
         // Convert external encrypted value to internal
         euint32 candidate = FHE.fromExternal(encryptedCandidate, inputProof);
 
-        // BUG: Missing require statement to validate candidate ID is within range 0-3
-        // This allows invalid candidate IDs to be processed
-
         // Store encrypted vote for this user (for verification/viewing)
         userVotes[msg.sender] = candidate;
 
@@ -137,6 +134,43 @@ contract CommunityVoting is SepoliaConfig {
             voteData.candidate4Votes,
             voteData.totalVotes
         );
+    }
+
+    /// @notice Get the encrypted vote counts for all candidates
+    /// @return candidate1Votes Encrypted vote count for candidate 1
+    /// @return candidate2Votes Encrypted vote count for candidate 2
+    /// @return candidate3Votes Encrypted vote count for candidate 3
+    /// @return candidate4Votes Encrypted vote count for candidate 4
+    /// @return totalVotes Encrypted total vote count
+    function getVoteCounts() external view returns (
+        euint32 candidate1Votes,
+        euint32 candidate2Votes,
+        euint32 candidate3Votes,
+        euint32 candidate4Votes,
+        euint32 totalVotes
+    ) {
+        // BUG: Return parameters in wrong order - candidate1 and candidate2 are swapped
+        return (
+            voteData.candidate2Votes,  // Should be candidate1Votes
+            voteData.candidate1Votes,  // Should be candidate2Votes
+            voteData.candidate3Votes,
+            voteData.candidate4Votes,
+            voteData.totalVotes
+        );
+    }
+
+    /// @notice Get the encrypted vote of a specific user
+    /// @param voter The address of the voter
+    /// @return The encrypted vote (candidate ID)
+    function getUserVote(address voter) external view returns (euint32) {
+        return userVotes[voter];
+    }
+
+    /// @notice Check if a user has voted
+    /// @param voter The address of the voter
+    /// @return Whether the user has voted
+    function checkHasVoted(address voter) external view returns (bool) {
+        return hasVoted[voter];
     }
 }
 
