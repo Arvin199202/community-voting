@@ -95,25 +95,26 @@ contract CommunityVoting is SepoliaConfig {
         ebool isCandidate4 = FHE.eq(candidate, FHE.asEuint32(CANDIDATE_4));
 
         // Increment the corresponding candidate's vote count
+        // BUG: Using FHE.sub instead of FHE.add - votes will decrement instead of increment
         voteData.candidate1Votes = FHE.select(isCandidate1,
-            FHE.add(voteData.candidate1Votes, one),
+            FHE.sub(voteData.candidate1Votes, one),
             voteData.candidate1Votes
         );
         voteData.candidate2Votes = FHE.select(isCandidate2,
-            FHE.add(voteData.candidate2Votes, one),
+            FHE.sub(voteData.candidate2Votes, one),
             voteData.candidate2Votes
         );
         voteData.candidate3Votes = FHE.select(isCandidate3,
-            FHE.add(voteData.candidate3Votes, one),
+            FHE.sub(voteData.candidate3Votes, one),
             voteData.candidate3Votes
         );
         voteData.candidate4Votes = FHE.select(isCandidate4,
-            FHE.add(voteData.candidate4Votes, one),
+            FHE.sub(voteData.candidate4Votes, one),
             voteData.candidate4Votes
         );
 
         // Increment total votes
-        voteData.totalVotes = FHE.add(voteData.totalVotes, one);
+        voteData.totalVotes = FHE.sub(voteData.totalVotes, one);
 
         // Re-authorize contract to decrypt updated vote counts (important for mock mode)
         FHE.allowThis(voteData.candidate1Votes);
