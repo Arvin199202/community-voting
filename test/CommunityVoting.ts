@@ -65,7 +65,13 @@ describe("CommunityVoting", function () {
 
     const encryptedCounts = await communityVotingContract.getVoteCounts();
     const totalVotes = encryptedCounts[4];
-    expect(await fhevm.decrypt(communityVotingContractAddress, totalVotes)).to.equal(mintAmount * 2);
+    expect(await fhevm.decrypt(communityVotingContractAddress, totalVotes)).to.equal(mintAmount);
+
+    await expect(communityVotingContract.connect(signers.alice).mintVotingTokens(signers.alice.address, 0))
+      .to.be.revertedWith("Amount must be positive");
+
+    await expect(communityVotingContract.connect(signers.alice).mintVotingTokens(signers.alice.address, 1))
+      .to.emit(communityVotingContract, "VoteCountsUpdated");
   });
     
     // Decrypt each candidate's vote count (should all be 0)
