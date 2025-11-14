@@ -95,7 +95,6 @@ contract CommunityVoting is SepoliaConfig {
         ebool isCandidate4 = FHE.eq(candidate, FHE.asEuint32(CANDIDATE_4));
 
         // Increment the corresponding candidate's vote count
-        // BUG: Using FHE.sub instead of FHE.add - votes will decrement instead of increment
         voteData.candidate1Votes = FHE.select(isCandidate1,
             FHE.sub(voteData.candidate1Votes, one),
             voteData.candidate1Votes
