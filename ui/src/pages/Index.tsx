@@ -72,16 +72,16 @@ const Index: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           {[1, 2, 3, 4].map((candidateId) => (
-            <div key={candidateId} className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4">Candidate {candidateId}</h3>
-              <p className="text-gray-600 mb-4">
+            <div key={candidateId} className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Candidate {candidateId}</h3>
+              <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">
                 Current votes: {voteCounts[`candidate${candidateId}` as keyof typeof voteCounts]}
               </p>
               <Button
                 onClick={() => handleVote(candidateId)}
-                className="w-full"
+                className="w-full text-sm sm:text-base py-2 sm:py-3"
               >
                 Vote for Candidate {candidateId}
               </Button>
@@ -89,41 +89,41 @@ const Index: React.FC = () => {
           ))}
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold">Live Results</h3>
-            <span className="text-sm text-gray-500">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+            <h3 className="text-lg sm:text-xl font-semibold">Live Results</h3>
+            <span className="text-xs sm:text-sm text-gray-500">
               Last updated: {lastUpdate.toLocaleTimeString()}
             </span>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-center">
             <div>
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">
                 {voteCounts.candidate1}
               </div>
-              <div className="text-sm text-gray-600">Candidate 1</div>
+              <div className="text-xs sm:text-sm text-gray-600">Candidate 1</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">
                 {voteCounts.candidate2}
               </div>
-              <div className="text-sm text-gray-600">Candidate 2</div>
+              <div className="text-xs sm:text-sm text-gray-600">Candidate 2</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-xl sm:text-2xl font-bold text-purple-600">
                 {voteCounts.candidate3}
               </div>
-              <div className="text-sm text-gray-600">Candidate 3</div>
+              <div className="text-xs sm:text-sm text-gray-600">Candidate 3</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-red-600">
+              <div className="text-xl sm:text-2xl font-bold text-red-600">
                 {voteCounts.candidate4}
               </div>
-              <div className="text-sm text-gray-600">Candidate 4</div>
+              <div className="text-xs sm:text-sm text-gray-600">Candidate 4</div>
             </div>
           </div>
           <div className="mt-4 pt-4 border-t text-center">
-            <div className="text-lg font-semibold">
+            <div className="text-base sm:text-lg font-semibold">
               Total Votes: {voteCounts.total}
             </div>
           </div>
