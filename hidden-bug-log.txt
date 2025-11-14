@@ -24,8 +24,8 @@ Description: Using FHE.sub instead of FHE.add for all vote count increments (15 
 Impact: Vote counts will decrement instead of increment, breaking the entire voting system
 Fix Required: Change all FHE.sub back to FHE.add in vote counting logic
 
-BUG_005: LIGHT
+BUG_005: LIGHT - FIXED
 Location: contracts/CommunityVoting.sol, vote() function VoteCast event emission
 Description: VoteCast event emits wrong candidate value - passes 0 instead of actual candidate ID
 Impact: Event logs will show incorrect candidate information
-Fix Required: Change emit VoteCast(msg.sender, 0, candidate) to emit VoteCast(msg.sender, uint8(FHE.decrypt(candidate)), candidate)
+Fix Applied: Changed event signature to use euint32 for candidate parameter and emit actual encrypted candidate value

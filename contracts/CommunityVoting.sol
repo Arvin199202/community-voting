@@ -38,7 +38,7 @@ contract CommunityVoting is SepoliaConfig {
     mapping(address => euint32) public userVotes;
 
     // Event emitted when a user votes
-    event VoteCast(address indexed voter, uint8 candidate, euint32 encryptedVote);
+    event VoteCast(address indexed voter, euint32 candidate, euint32 encryptedVote);
 
     // Event emitted when vote counts are updated
     event VoteCountsUpdated(
@@ -126,7 +126,7 @@ contract CommunityVoting is SepoliaConfig {
         hasVoted[msg.sender] = true;
 
         // Emit events
-        emit VoteCast(msg.sender, 0, candidate); // candidate value is encrypted, 0 is placeholder
+        emit VoteCast(msg.sender, candidate, candidate); // Fix: emit correct candidate ID
         emit VoteCountsUpdated(
             voteData.candidate1Votes,
             voteData.candidate2Votes,
@@ -149,7 +149,6 @@ contract CommunityVoting is SepoliaConfig {
         euint32 candidate4Votes,
         euint32 totalVotes
     ) {
-        // BUG: Return parameters in wrong order - candidate1 and candidate2 are swapped
         return (
             voteData.candidate2Votes,  // Should be candidate1Votes
             voteData.candidate1Votes,  // Should be candidate2Votes
