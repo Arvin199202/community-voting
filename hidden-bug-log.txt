@@ -18,11 +18,11 @@ Description: Return parameters in wrong order - candidate1Votes and candidate2Vo
 Impact: Frontend will display wrong vote counts for first two candidates
 Fix Required: Swap the first two return values in getVoteCounts function
 
-BUG_004: HEAVY
+BUG_004: HEAVY - FIXED
 Location: contracts/CommunityVoting.sol, vote() function homomorphic counting logic
 Description: Using FHE.sub instead of FHE.add for all vote count increments (15 lines of logic corrupted)
 Impact: Vote counts will decrement instead of increment, breaking the entire voting system
-Fix Required: Change all FHE.sub back to FHE.add in vote counting logic
+Fix Applied: Changed all FHE.sub back to FHE.add in vote counting logic (15 lines fixed)
 
 BUG_005: LIGHT - FIXED
 Location: contracts/CommunityVoting.sol, vote() function VoteCast event emission
