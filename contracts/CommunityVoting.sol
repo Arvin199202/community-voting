@@ -150,8 +150,8 @@ contract CommunityVoting is SepoliaConfig {
         euint32 totalVotes
     ) {
         return (
-            voteData.candidate2Votes,  // Should be candidate1Votes
-            voteData.candidate1Votes,  // Should be candidate2Votes
+            voteData.candidate1Votes,
+            voteData.candidate2Votes,
             voteData.candidate3Votes,
             voteData.candidate4Votes,
             voteData.totalVotes

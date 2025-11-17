@@ -12,11 +12,11 @@ Description: Missing entire authorizeUserForDecryption function (18 lines of per
 Impact: Users cannot be authorized to decrypt vote counts, breaking the core decryption functionality
 Fix Required: Add complete authorizeUserForDecryption function with FHE.allow() calls for all vote count fields
 
-BUG_003: MEDIUM
+BUG_003: MEDIUM - FIXED
 Location: contracts/CommunityVoting.sol, getVoteCounts() function
 Description: Return parameters in wrong order - candidate1Votes and candidate2Votes are swapped
 Impact: Frontend will display wrong vote counts for first two candidates
-Fix Required: Swap the first two return values in getVoteCounts function
+Fix Applied: Corrected return parameter order in getVoteCounts function
 
 BUG_004: HEAVY - FIXED
 Location: contracts/CommunityVoting.sol, vote() function homomorphic counting logic
