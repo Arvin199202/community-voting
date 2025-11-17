@@ -82,8 +82,9 @@ contract CommunityVoting is SepoliaConfig {
     function vote(
         externalEuint32 encryptedCandidate,
         bytes calldata inputProof
-    ) external {
+    ) external payable {
         require(!hasVoted[msg.sender], "CommunityVoting: already voted");
+        require(msg.value == 0, "No payment required for voting");
 
         euint32 candidate = FHE.fromExternal(encryptedCandidate, inputProof);
 
@@ -99,40 +100,40 @@ contract CommunityVoting is SepoliaConfig {
         ebool isCandidate3 = FHE.eq(candidate, FHE.asEuint32(CANDIDATE_3));
         ebool isCandidate4 = FHE.eq(candidate, FHE.asEuint32(CANDIDATE_4));
 
-        voteData.candidate1Votes = FHE.select(isCandidate1,
-            FHE.add(voteData.candidate1Votes, one),
-            voteData.candidate1Votes
+        voteDataCache.candidate1Votes = FHE.select(isCandidate1,
+            FHE.add(voteDataCache.candidate1Votes, one),
+            voteDataCache.candidate1Votes
         );
-        voteData.candidate2Votes = FHE.select(isCandidate2,
-            FHE.add(voteData.candidate2Votes, one),
-            voteData.candidate2Votes
+        voteDataCache.candidate2Votes = FHE.select(isCandidate2,
+            FHE.add(voteDataCache.candidate2Votes, one),
+            voteDataCache.candidate2Votes
         );
-        voteData.candidate3Votes = FHE.select(isCandidate3,
-            FHE.add(voteData.candidate3Votes, one),
-            voteData.candidate3Votes
+        voteDataCache.candidate3Votes = FHE.select(isCandidate3,
+            FHE.add(voteDataCache.candidate3Votes, one),
+            voteDataCache.candidate3Votes
         );
-        voteData.candidate4Votes = FHE.select(isCandidate4,
-            FHE.add(voteData.candidate4Votes, one),
-            voteData.candidate4Votes
+        voteDataCache.candidate4Votes = FHE.select(isCandidate4,
+            FHE.add(voteDataCache.candidate4Votes, one),
+            voteDataCache.candidate4Votes
         );
 
-        voteData.totalVotes = FHE.add(voteData.totalVotes, one);
+        voteDataCache.totalVotes = FHE.add(voteDataCache.totalVotes, one);
 
-        FHE.allowThis(voteData.candidate1Votes);
-        FHE.allowThis(voteData.candidate2Votes);
-        FHE.allowThis(voteData.candidate3Votes);
-        FHE.allowThis(voteData.candidate4Votes);
-        FHE.allowThis(voteData.totalVotes);
+        FHE.allowThis(voteDataCache.candidate1Votes);
+        FHE.allowThis(voteDataCache.candidate2Votes);
+        FHE.allowThis(voteDataCache.candidate3Votes);
+        FHE.allowThis(voteDataCache.candidate4Votes);
+        FHE.allowThis(voteDataCache.totalVotes);
 
         hasVoted[msg.sender] = true;
 
         emit VoteCast(msg.sender, 0, candidate);
         emit VoteCountsUpdated(
-            voteData.candidate1Votes,
-            voteData.candidate2Votes,
-            voteData.candidate3Votes,
-            voteData.candidate4Votes,
-            voteData.totalVotes
+            voteDataCache.candidate1Votes,
+            voteDataCache.candidate2Votes,
+            voteDataCache.candidate3Votes,
+            voteDataCache.candidate4Votes,
+            voteDataCache.totalVotes
         );
     }
 
