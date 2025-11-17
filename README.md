@@ -431,6 +431,101 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+## 🔌 API Reference
+
+### Smart Contract Functions
+
+#### Voting Functions
+
+```solidity
+function vote(externalEuint32 encryptedCandidate, bytes calldata inputProof) external payable
+```
+Cast an encrypted vote for a candidate (0-3).
+
+**Parameters:**
+- `encryptedCandidate`: Encrypted candidate ID using FHE
+- `inputProof`: Zero-knowledge proof for the encrypted input
+
+**Requirements:**
+- User must not have voted before
+- Candidate ID must be 0-3
+
+#### Query Functions
+
+```solidity
+function getVoteCounts() external view returns (euint32, euint32, euint32, euint32, euint32)
+```
+Returns encrypted vote counts for all candidates and total votes.
+
+**Returns:**
+- `candidate1Votes`: Encrypted votes for candidate 1
+- `candidate2Votes`: Encrypted votes for candidate 2
+- `candidate3Votes`: Encrypted votes for candidate 3
+- `candidate4Votes`: Encrypted votes for candidate 4
+- `totalVotes`: Encrypted total vote count
+
+```solidity
+function getUserVote(address voter) external view returns (euint32)
+```
+Returns the encrypted vote of a specific user.
+
+#### Proposal Functions
+
+```solidity
+function createProposal(string memory title, string memory description) external
+```
+Create a new community proposal.
+
+**Parameters:**
+- `title`: Proposal title (1-100 characters)
+- `description`: Proposal description (1-1000 characters)
+
+**Requirements:**
+- Title and description cannot be empty
+- Length limits must be respected
+
+### Frontend Components
+
+#### WalletConnector
+Handles wallet connection and reconnection with user feedback.
+
+**Props:** None
+
+**Features:**
+- MetaMask detection and connection
+- Automatic reconnection logic
+- Error and success notifications
+
+#### VoteHistory
+Displays user's voting history with transaction details.
+
+**Features:**
+- Address-based history lookup
+- Transaction hash display
+- Timestamp formatting
+
+#### EventMonitor
+Real-time blockchain event monitoring and display.
+
+**Features:**
+- Server-Sent Events integration
+- Event filtering and display
+- Block number and transaction tracking
+
+### Environment Variables
+
+```bash
+# Required for deployment
+INFURA_API_KEY=your_infura_key
+PRIVATE_KEY=your_deployment_private_key
+ETHERSCAN_API_KEY=your_etherscan_key
+
+# Optional
+MNEMONIC=your_wallet_mnemonic
+```
+
+---
+
 ## 📞 Support
 
 - 📧 **Email**: duan-hb@github.com
