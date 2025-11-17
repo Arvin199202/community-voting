@@ -73,6 +73,61 @@ describe("CommunityVoting", function () {
     await expect(communityVotingContract.connect(signers.alice).mintVotingTokens(signers.alice.address, 1))
       .to.emit(communityVotingContract, "VoteCountsUpdated");
   });
+
+  it("should allow users to vote for different candidates", async function () {
+    const vote1 = fhevm.createEncryptedInput(await communityVotingContract.getAddress(), signers.alice.address);
+    vote1.add8(0); // Vote for candidate 1
+    const encryptedVote1 = vote1.encrypt();
+
+    const vote2 = fhevm.createEncryptedInput(await communityVotingContract.getAddress(), signers.bob.address);
+    vote2.add8(1); // Vote for candidate 2
+    const encryptedVote2 = vote2.encrypt();
+
+    await expect(communityVotingContract.connect(signers.alice).vote(encryptedVote1.handles[0], encryptedVote1.inputProof))
+      .to.emit(communityVotingContract, "VoteCast");
+
+    await expect(communityVotingContract.connect(signers.bob).vote(encryptedVote2.handles[0], encryptedVote2.inputProof))
+      .to.emit(communityVotingContract, "VoteCast");
+
+    const encryptedCounts = await communityVotingContract.getVoteCounts();
+    expect(await fhevm.decrypt(communityVotingContractAddress, encryptedCounts[0])).to.equal(1); // Candidate 1
+    expect(await fhevm.decrypt(communityVotingContractAddress, encryptedCounts[1])).to.equal(1); // Candidate 2
+  });
+
+  it("should prevent double voting", async function () {
+    const vote = fhevm.createEncryptedInput(await communityVotingContract.getAddress(), signers.alice.address);
+    vote.add8(0);
+    const encryptedVote = vote.encrypt();
+
+    await communityVotingContract.connect(signers.alice).vote(encryptedVote.handles[0], encryptedVote.inputProof);
+
+    await expect(communityVotingContract.connect(signers.alice).vote(encryptedVote.handles[0], encryptedVote.inputProof))
+      .to.be.revertedWith("CommunityVoting: already voted");
+  });
+
+  it("should allow proposal creation with valid inputs", async function () {
+    const title = "Test Proposal";
+    const description = "This is a test proposal for community voting system";
+
+    await expect(communityVotingContract.connect(signers.alice).createProposal(title, description))
+      .to.emit(communityVotingContract, "ProposalCreated");
+
+    const proposal = await communityVotingContract.proposals(0);
+    expect(proposal.title).to.equal(title);
+    expect(proposal.description).to.equal(description);
+    expect(proposal.creator).to.equal(signers.alice.address);
+    expect(proposal.active).to.be.true;
+  });
+
+  it("should reject proposal creation with empty title", async function () {
+    await expect(communityVotingContract.connect(signers.alice).createProposal("", "Valid description"))
+      .to.be.revertedWith("Title cannot be empty");
+  });
+
+  it("should reject proposal creation with empty description", async function () {
+    await expect(communityVotingContract.connect(signers.alice).createProposal("Valid title", ""))
+      .to.be.revertedWith("Description cannot be empty");
+  });
     
     // Decrypt each candidate's vote count (should all be 0)
     const candidate1Count = await fhevm.userDecryptEuint(
