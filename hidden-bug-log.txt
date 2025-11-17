@@ -6,11 +6,11 @@ Description: Missing require statement to validate candidate ID range (0-3)
 Impact: Allows invalid candidate IDs to be processed, potentially causing unexpected behavior
 Fix Required: Add require(FHE.decrypt(candidate) >= 0 && FHE.decrypt(candidate) <= 3, "Invalid candidate ID");
 
-BUG_002: HEAVY
+BUG_002: HEAVY - FIXED
 Location: contracts/CommunityVoting.sol
 Description: Missing entire authorizeUserForDecryption function (18 lines of permission management logic)
 Impact: Users cannot be authorized to decrypt vote counts, breaking the core decryption functionality
-Fix Required: Add complete authorizeUserForDecryption function with FHE.allow() calls for all vote count fields
+Fix Applied: Added complete authorizeUserForDecryption function with FHE.allow() calls for all vote count fields
 
 BUG_003: MEDIUM - FIXED
 Location: contracts/CommunityVoting.sol, getVoteCounts() function

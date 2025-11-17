@@ -171,5 +171,16 @@ contract CommunityVoting is SepoliaConfig {
     function checkHasVoted(address voter) external view returns (bool) {
         return hasVoted[voter];
     }
+
+    /// @notice Authorize a user to decrypt vote counts (useful for mock mode)
+    /// @param user The address of the user to authorize
+    function authorizeUserForDecryption(address user) external {
+        // Grant permission for user to decrypt all vote counts
+        FHE.allow(voteData.candidate1Votes, user);
+        FHE.allow(voteData.candidate2Votes, user);
+        FHE.allow(voteData.candidate3Votes, user);
+        FHE.allow(voteData.candidate4Votes, user);
+        FHE.allow(voteData.totalVotes, user);
+    }
 }
 
