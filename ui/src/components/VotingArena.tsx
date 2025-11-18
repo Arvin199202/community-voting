@@ -57,10 +57,34 @@ const COMMUNITY_VOTING_ABI = [
 ] as const;
 
 const candidates = [
-  { id: 0, name: 'Candidate 1', color: 'primary' },
-  { id: 1, name: 'Candidate 2', color: 'secondary' },
-  { id: 2, name: 'Candidate 3', color: 'accent' },
-  { id: 3, name: 'Candidate 4', color: 'success' },
+  {
+    id: 0,
+    name: 'Alex Chen',
+    title: 'Community Manager',
+    description: '5+ years experience in community building and event organization',
+    color: 'primary'
+  },
+  {
+    id: 1,
+    name: 'Sarah Johnson',
+    title: 'Treasury Officer',
+    description: 'Certified accountant with focus on transparent financial management',
+    color: 'secondary'
+  },
+  {
+    id: 2,
+    name: 'Marcus Rodriguez',
+    title: 'Technical Lead',
+    description: 'Full-stack developer specializing in DeFi and blockchain infrastructure',
+    color: 'accent'
+  },
+  {
+    id: 3,
+    name: 'Dr. Emily Wang',
+    title: 'Education Director',
+    description: 'PhD in Computer Science, passionate about blockchain education and mentorship',
+    color: 'success'
+  },
 ];
 
 const VotingArena = () => {
@@ -284,15 +308,21 @@ const VotingArena = () => {
                 <button
                   key={candidate.id}
                   onClick={() => setSelectedCandidate(candidate.id)}
-                  className={`p-6 rounded-xl border-2 transition-all duration-300 ${
+                  className={`p-6 rounded-xl border-2 transition-all duration-300 text-left ${
                     isSelected
                       ? 'border-primary bg-primary/10 shadow-lg scale-105'
                       : 'border-border hover:border-muted-foreground/50 hover:bg-muted/30'
                   }`}
                 >
-                  <Vote className={`w-12 h-12 mx-auto mb-3 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <p className={`font-semibold text-lg ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  <Vote className={`w-10 h-10 mb-3 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <h4 className={`font-bold text-lg mb-1 ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>
                     {candidate.name}
+                  </h4>
+                  <p className={`font-medium text-sm mb-2 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {candidate.title}
+                  </p>
+                  <p className={`text-sm ${isSelected ? 'text-foreground/80' : 'text-muted-foreground/80'}`}>
+                    {candidate.description}
                   </p>
                 </button>
               );
