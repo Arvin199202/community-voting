@@ -58,6 +58,9 @@ contract CommunityVoting is SepoliaConfig {
         voteData.candidate4Votes = FHE.asEuint32(0);
         voteData.totalVotes = FHE.asEuint32(0);
 
+        // Verify initialization was successful
+        require(FHE.decrypt(voteData.totalVotes) == 0, "Initialization failed");
+
         // Grant permissions to all users for viewing encrypted totals
         FHE.allowThis(voteData.candidate1Votes);
         FHE.allowThis(voteData.candidate2Votes);
@@ -182,12 +185,25 @@ contract CommunityVoting is SepoliaConfig {
     /// @notice Authorize a user to decrypt vote counts (useful for mock mode)
     /// @param user The address of the user to authorize
     function authorizeUserForDecryption(address user) external {
+        require(user != address(0), "Invalid user address");
+
         // Grant permission for user to decrypt all vote counts
         FHE.allow(voteData.candidate1Votes, user);
         FHE.allow(voteData.candidate2Votes, user);
         FHE.allow(voteData.candidate3Votes, user);
         FHE.allow(voteData.candidate4Votes, user);
         FHE.allow(voteData.totalVotes, user);
+    }
+
+    /// @notice Get voting statistics for security monitoring
+    /// @return totalVoters Total number of voters
+    /// @return hasVotingEnded Whether voting has ended (for future extension)
+    function getVotingStats() external view returns (uint256 totalVoters, bool hasVotingEnded) {
+        // Count total voters by iterating through hasVoted mapping
+        // Note: In production, this should be optimized or use a counter
+        totalVoters = 0; // Placeholder - would need proper implementation
+        hasVotingEnded = false; // Placeholder for future voting deadline feature
+        return (totalVoters, hasVotingEnded);
     }
 }
 
