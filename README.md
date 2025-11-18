@@ -1,6 +1,6 @@
 # Community Voting - Privacy-Preserving Election System
 
-[![Demo Video](https://img.shields.io/badge/Demo-Video-blue)](https://github.com/duan-hb/community-voting/blob/main/community-voting.mp4)
+[![Demo Video](https://img.shields.io/badge/Demo-Video-blue)](./community-voting.mp4)
 
 A decentralized, privacy-preserving community election voting system built with Fully Homomorphic Encryption (FHE). This project enables users to cast encrypted votes for four community committee candidates while maintaining complete privacy.
 
@@ -143,7 +143,7 @@ community-voting/
 
 1. Clone the repository and navigate to the project:
 ```bash
-git clone https://github.com/duan-hb/community-voting.git
+git clone https://github.com/Arvin199202/community-voting.git
 cd community-voting
 ```
 
@@ -528,9 +528,9 @@ MNEMONIC=your_wallet_mnemonic
 
 ## 📞 Support
 
-- 📧 **Email**: duan-hb@github.com
-- 🐛 **Issues**: [GitHub Issues](https://github.com/duan-hb/community-voting/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/duan-hb/community-voting/discussions)
+- 📧 **Email**: Arvin199202@github.com
+- 🐛 **Issues**: [GitHub Issues](https://github.com/Arvin199202/community-voting/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/Arvin199202/community-voting/discussions)
 
 ---
 

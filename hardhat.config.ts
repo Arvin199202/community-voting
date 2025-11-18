@@ -78,11 +78,16 @@ const config: HardhatUserConfig = {
         // https://github.com/paulrberg/hardhat-template/issues/31
         bytecodeHash: "none",
       },
-      // Disable the optimizer when debugging
-      // https://hardhat.org/hardhat-network/#solidity-optimizer-support
+      // Production optimization settings
       optimizer: {
         enabled: true,
-        runs: 800,
+        runs: 1000, // Increased for production deployment
+        details: {
+          yul: true, // Enable Yul optimizer
+          yulDetails: {
+            stackAllocation: true,
+          },
+        },
       },
       viaIR: true, // Enable intermediate representation for better optimization
       evmVersion: "cancun",
