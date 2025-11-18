@@ -78,6 +78,13 @@ contract CommunityVoting is SepoliaConfig {
         // Convert external encrypted value to internal
         euint32 candidate = FHE.fromExternal(encryptedCandidate, inputProof);
 
+        // Validate candidate ID is within range 0-3
+        // Using FHE operations to verify candidate is between 0 and 3 inclusive
+        ebool isValidLow = FHE.gte(candidate, FHE.asEuint32(0));
+        ebool isValidHigh = FHE.lte(candidate, FHE.asEuint32(3));
+        ebool isValid = FHE.and(isValidLow, isValidHigh);
+        require(FHE.decrypt(isValid), "Invalid candidate ID: must be 0-3");
+
         // Store encrypted vote for this user (for verification/viewing)
         userVotes[msg.sender] = candidate;
 

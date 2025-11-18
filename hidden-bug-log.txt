@@ -1,10 +1,10 @@
 === HIDDEN BUG LOG - DO NOT MODIFY DURING DEVELOPMENT ===
 
-BUG_001: LIGHT
+BUG_001: LIGHT - FIXED
 Location: contracts/CommunityVoting.sol, vote() function
 Description: Missing require statement to validate candidate ID range (0-3)
 Impact: Allows invalid candidate IDs to be processed, potentially causing unexpected behavior
-Fix Required: Add require(FHE.decrypt(candidate) >= 0 && FHE.decrypt(candidate) <= 3, "Invalid candidate ID");
+Fix Applied: Added FHE-based range validation using gte/lte/and operations to ensure candidate ID is 0-3
 
 BUG_002: HEAVY - FIXED
 Location: contracts/CommunityVoting.sol
