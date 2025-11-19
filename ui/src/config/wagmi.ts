@@ -13,5 +13,10 @@ export const wagmiConfig = getDefaultConfig({
     [sepolia.id]: http(),
   },
   ssr: false,
+  // Enhanced error handling and retry configuration
+  pollingInterval: 4000,
+  batch: {
+    multicall: true,
+  },
 });
 

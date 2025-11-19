@@ -23,6 +23,7 @@ interface FHEVMContextType {
   error: string | null;
   isInitialized: boolean;
   initializeInstance: () => Promise<void>;
+  retryInitialization: () => Promise<void>;
 }
 
 const FHEVMContext = createContext<FHEVMContextType | undefined>(undefined);
@@ -248,12 +249,20 @@ export function FHEVMProvider({ children }: { children: ReactNode }) {
     }
   }, [isConnected, address, chainId, instance, isLoading, initializeInstance]);
 
+  const retryInitialization = useCallback(async () => {
+    setInstance(null);
+    setIsInitialized(false);
+    setError(null);
+    await initializeInstance();
+  }, [initializeInstance]);
+
   const value: FHEVMContextType = {
     instance,
     isLoading,
     error,
     isInitialized,
     initializeInstance,
+    retryInitialization,
   };
 
   return <FHEVMContext.Provider value={value}>{children}</FHEVMContext.Provider>;
