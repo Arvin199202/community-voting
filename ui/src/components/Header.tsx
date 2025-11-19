@@ -1,4 +1,5 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import NetworkStatus from './NetworkStatus';
 import logo from '@/assets/logo.png';
 
 const Header = () => {
@@ -18,6 +19,7 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
+            <NetworkStatus />
             <ConnectButton showBalance={false} />
           </div>
         </div>

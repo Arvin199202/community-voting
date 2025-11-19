@@ -7,6 +7,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 
 import { wagmiConfig } from './config/wagmi';
 import { FHEVMProvider } from './hooks/useFHEVM';
+import ErrorBoundary from './components/ErrorBoundary';
 import App from './App';
 import './index.css';
 
@@ -14,15 +15,17 @@ const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider locale="en">
-          <FHEVMProvider>
-            <App />
-          </FHEVMProvider>
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <ErrorBoundary>
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider locale="en">
+            <FHEVMProvider>
+              <App />
+            </FHEVMProvider>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );
 
