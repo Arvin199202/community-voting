@@ -301,7 +301,7 @@ const VotingArena = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6 mb-8">
             {candidates.map((candidate) => {
               const isSelected = selectedCandidate === candidate.id;
               return (
