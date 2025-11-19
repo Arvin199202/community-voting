@@ -36,10 +36,34 @@ const COMMUNITY_VOTING_ABI = [
 ] as const;
 
 const candidates = [
-  { id: 0, name: 'Candidate 1', color: 'primary' },
-  { id: 1, name: 'Candidate 2', color: 'secondary' },
-  { id: 2, name: 'Candidate 3', color: 'accent' },
-  { id: 3, name: 'Candidate 4', color: 'success' },
+  {
+    id: 0,
+    name: 'Alex Chen',
+    title: 'Community Manager',
+    description: '5+ years experience in community building and event organization',
+    color: 'primary'
+  },
+  {
+    id: 1,
+    name: 'Sarah Johnson',
+    title: 'Treasury Officer',
+    description: 'Certified accountant with focus on transparent financial management',
+    color: 'secondary'
+  },
+  {
+    id: 2,
+    name: 'Marcus Rodriguez',
+    title: 'Technical Lead',
+    description: 'Full-stack developer specializing in DeFi and blockchain infrastructure',
+    color: 'accent'
+  },
+  {
+    id: 3,
+    name: 'Dr. Emily Wang',
+    title: 'Education Director',
+    description: 'PhD in Computer Science, passionate about blockchain education and mentorship',
+    color: 'success'
+  },
 ];
 
 const ResultsDisplay = () => {
@@ -392,7 +416,10 @@ const ResultsDisplay = () => {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <Vote className="w-8 h-8 text-primary" />
-                      <h4 className="text-xl font-semibold">{candidate.name}</h4>
+                      <div>
+                        <h4 className="text-xl font-semibold">{candidate.name}</h4>
+                        <p className="text-sm text-muted-foreground">{candidate.title}</p>
+                      </div>
                     </div>
                     {count !== null ? (
                       <Unlock className="w-5 h-5 text-success" />
