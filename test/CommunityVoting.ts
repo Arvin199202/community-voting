@@ -253,5 +253,116 @@ describe("CommunityVoting", function () {
 
     expect(decryptedVote).to.eq(candidateId);
   });
+
+  it("should authorize user for decryption and allow vote count decryption", async function () {
+    const candidateId = 0;
+
+    // Alice votes
+    const encryptedCandidate = await fhevm.userEncryptEuint(
+      FhevmType.euint32,
+      candidateId,
+      communityVotingContractAddress,
+      signers.alice,
+    );
+
+    await communityVotingContract
+      .connect(signers.alice)
+      .vote(encryptedCandidate.handles[0], encryptedCandidate.inputProof);
+
+    // Authorize Bob for decryption
+    await communityVotingContract.connect(signers.alice).authorizeUserForDecryption(signers.bob.address);
+
+    // Bob should now be able to decrypt vote counts
+    const encryptedCounts = await communityVotingContract.getVoteCounts();
+
+    // Decrypt candidate 1 votes (should be 1)
+    const decryptedCandidate1Votes = await fhevm.userDecryptEuint(
+      FhevmType.euint32,
+      encryptedCounts.candidate1Votes,
+      communityVotingContractAddress,
+      signers.bob,
+    );
+
+    expect(decryptedCandidate1Votes).to.eq(1);
+  });
+
+  it("should reject authorization with zero address", async function () {
+    await expect(
+      communityVotingContract.connect(signers.alice).authorizeUserForDecryption(ethers.ZeroAddress)
+    ).to.be.revertedWith("Invalid user address");
+  });
+
+  it("should handle multiple votes correctly", async function () {
+    // Alice votes for candidate 0
+    const encryptedCandidate0 = await fhevm.userEncryptEuint(
+      FhevmType.euint32,
+      0,
+      communityVotingContractAddress,
+      signers.alice,
+    );
+
+    await communityVotingContract
+      .connect(signers.alice)
+      .vote(encryptedCandidate0.handles[0], encryptedCandidate0.inputProof);
+
+    // Bob votes for candidate 1
+    const encryptedCandidate1 = await fhevm.userEncryptEuint(
+      FhevmType.euint32,
+      1,
+      communityVotingContractAddress,
+      signers.bob,
+    );
+
+    await communityVotingContract
+      .connect(signers.bob)
+      .vote(encryptedCandidate1.handles[0], encryptedCandidate1.inputProof);
+
+    // Authorize Alice for decryption
+    await communityVotingContract.connect(signers.alice).authorizeUserForDecryption(signers.alice.address);
+
+    // Check vote counts
+    const encryptedCounts = await communityVotingContract.getVoteCounts();
+
+    const decryptedCandidate0Votes = await fhevm.userDecryptEuint(
+      FhevmType.euint32,
+      encryptedCounts.candidate1Votes,
+      communityVotingContractAddress,
+      signers.alice,
+    );
+
+    const decryptedCandidate1Votes = await fhevm.userDecryptEuint(
+      FhevmType.euint32,
+      encryptedCounts.candidate2Votes,
+      communityVotingContractAddress,
+      signers.alice,
+    );
+
+    const decryptedTotalVotes = await fhevm.userDecryptEuint(
+      FhevmType.euint32,
+      encryptedCounts.totalVotes,
+      communityVotingContractAddress,
+      signers.alice,
+    );
+
+    expect(decryptedCandidate0Votes).to.eq(1);
+    expect(decryptedCandidate1Votes).to.eq(1);
+    expect(decryptedTotalVotes).to.eq(2);
+  });
+
+  it("should prevent voting with invalid candidate ID", async function () {
+    // Try to vote with candidate ID 5 (invalid)
+    const encryptedCandidate = await fhevm.userEncryptEuint(
+      FhevmType.euint32,
+      5,
+      communityVotingContractAddress,
+      signers.alice,
+    );
+
+    await expect(
+      communityVotingContract
+        .connect(signers.alice)
+        .vote(encryptedCandidate.handles[0], encryptedCandidate.inputProof)
+    ).to.be.revertedWith("Invalid candidate ID: must be 0-3");
+  });
 });
 
