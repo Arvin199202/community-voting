@@ -78,3 +78,103 @@ task("voting:checkHasVoted", "Check if an address has voted")
     console.log(`Address ${taskArgs.address} has ${hasVoted ? "" : "not "}voted`);
   });
 
+task("voting:authorize", "Authorize a user for vote count decryption")
+  .addParam("user", "The address to authorize")
+  .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
+    const { deployments, ethers } = hre;
+    const CommunityVotingDeployment = await deployments.get("CommunityVoting");
+    const communityVotingContract = await ethers.getContractAt(
+      "CommunityVoting",
+      CommunityVotingDeployment.address
+    );
+
+    const signers = await ethers.getSigners();
+    const tx = await communityVotingContract.connect(signers[0]).authorizeUserForDecryption(taskArgs.user);
+    await tx.wait();
+
+    console.log(`Successfully authorized ${taskArgs.user} for vote count decryption`);
+  });
+
+task("voting:vote", "Cast a vote for a candidate (mock mode only)")
+  .addParam("candidate", "Candidate ID (0-3)")
+  .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
+    const { deployments, ethers, fhevm } = hre;
+
+    if (!fhevm.isMock) {
+      console.error("This task only works in mock mode (local Hardhat network)");
+      return;
+    }
+
+    const CommunityVotingDeployment = await deployments.get("CommunityVoting");
+    const communityVotingContract = await ethers.getContractAt(
+      "CommunityVoting",
+      CommunityVotingDeployment.address
+    );
+
+    const signers = await ethers.getSigners();
+    const candidateId = parseInt(taskArgs.candidate);
+
+    if (candidateId < 0 || candidateId > 3) {
+      console.error("Candidate ID must be between 0 and 3");
+      return;
+    }
+
+    console.log(`Casting vote for candidate ${candidateId}...`);
+
+    // Encrypt the candidate ID
+    const encryptedCandidate = await fhevm.userEncryptEuint(
+      FhevmType.euint32,
+      candidateId,
+      CommunityVotingDeployment.address,
+      signers[0],
+    );
+
+    // Submit the vote
+    const tx = await communityVotingContract
+      .connect(signers[0])
+      .vote(encryptedCandidate.handles[0], encryptedCandidate.inputProof);
+
+    await tx.wait();
+
+    console.log(`Successfully voted for candidate ${candidateId}`);
+    console.log(`Transaction hash: ${tx.hash}`);
+  });
+
+task("voting:getUserVote", "Get a user's encrypted vote")
+  .addParam("address", "The voter's address")
+  .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
+    const { deployments, ethers } = hre;
+    const CommunityVotingDeployment = await deployments.get("CommunityVoting");
+    const communityVotingContract = await ethers.getContractAt(
+      "CommunityVoting",
+      CommunityVotingDeployment.address
+    );
+
+    const userVote = await communityVotingContract.getUserVote(taskArgs.address);
+    console.log(`Encrypted vote for ${taskArgs.address}: ${userVote}`);
+  });
+
+task("voting:stats", "Get voting statistics")
+  .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
+    const { deployments, ethers } = hre;
+    const CommunityVotingDeployment = await deployments.get("CommunityVoting");
+    const communityVotingContract = await ethers.getContractAt(
+      "CommunityVoting",
+      CommunityVotingDeployment.address
+    );
+
+    console.log("Voting Statistics:");
+    console.log("==================");
+
+    // Get vote counts
+    const voteCounts = await communityVotingContract.getVoteCounts();
+    console.log("Vote counts retrieved (encrypted):", voteCounts);
+
+    // Get contract info
+    const numCandidates = await communityVotingContract.NUM_CANDIDATES();
+    console.log(`Number of candidates: ${numCandidates}`);
+
+    console.log(`Contract address: ${CommunityVotingDeployment.address}`);
+    console.log(`Deployed at block: ${CommunityVotingDeployment.receipt?.blockNumber || 'Unknown'}`);
+  });
+
