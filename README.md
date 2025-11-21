@@ -1,6 +1,6 @@
 # Community Voting - Privacy-Preserving Election System
 
-[![Demo Video](https://img.shields.io/badge/Demo-Video-blue)](./community-voting.mp4)
+[![Demo Video](https://img.shields.io/badge/Demo-Video-blue)](./community-voting.mp4) [![Screenshots](https://img.shields.io/badge/Screenshots-View-green)](./SCREENSHOTS.md)
 
 A decentralized, privacy-preserving community election voting system built with Fully Homomorphic Encryption (FHE). This project enables users to cast encrypted votes for four community committee candidates while maintaining complete privacy.
 
@@ -18,6 +18,9 @@ A decentralized, privacy-preserving community election voting system built with 
 - **📊 Real-time Results**: View encrypted vote counts that update in real-time
 - **🏛️ Decentralized**: Built on Ethereum with smart contract-based voting logic
 - **🎨 User-Friendly**: Modern React UI with Rainbow wallet integration
+
+### 📸 [View Screenshots & Demo](./SCREENSHOTS.md)
+See the application in action with detailed screenshots and a comprehensive demo video.
 
 ### Technical Highlights
 - **FHEVM Integration**: Full homomorphic encryption for vote privacy
