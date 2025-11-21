@@ -41,3 +41,8 @@ fhevmTemp/
 
 # Hardhat network data
 hardhat-network-data/
+
+# Project backups and logs (sensitive files)
+initial-backup-20251125.zip
+final-backup-20251125.zip
+hidden-bug-log.txt
