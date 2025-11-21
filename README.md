@@ -396,6 +396,260 @@ ETHERSCAN_API_KEY=your_etherscan_api_key
 └── types/                     # Auto-generated TypeScript types
 ```
 
+## 🏗️ Architecture Overview
+
+### System Components
+
+```
+Community Voting System
+├── 🎯 Smart Contracts (Solidity + FHEVM)
+│   ├── CommunityVoting.sol - Main voting contract
+│   ├── Encrypted vote storage and computation
+│   └── Permission-based decryption system
+│
+├── 🎨 Frontend (React + TypeScript)
+│   ├── VotingArena - Vote casting interface
+│   ├── ResultsDisplay - Real-time results viewer
+│   ├── FHEVM integration layer
+│   └── Wallet connection (RainbowKit)
+│
+└── 🛠️ Development Tools
+    ├── Hardhat - Contract development & testing
+    ├── Local FHEVM mock environment
+    ├── Sepolia testnet deployment
+    └── Comprehensive test suites
+```
+
+### Data Flow
+
+1. **Vote Casting**:
+   - User connects wallet → Selects candidate → Encrypts choice client-side
+   - Encrypted vote submitted to blockchain → Homomorphic counting occurs
+   - Vote permanently recorded while maintaining privacy
+
+2. **Results Viewing**:
+   - Encrypted totals displayed in real-time
+   - Authorized users can decrypt results using FHEVM relayer
+   - Zero-knowledge proofs ensure data integrity
+
+### Security Model
+
+- **Encryption**: All votes encrypted using FHE before submission
+- **Privacy**: Votes remain encrypted until authorized decryption
+- **Integrity**: Homomorphic operations ensure accurate counting
+- **Authentication**: Wallet signatures for all transactions
+- **Authorization**: Fine-grained decryption permissions
+
+## 🔬 Technical Deep Dive
+
+### FHEVM Integration Details
+
+#### Encryption Workflow
+
+```typescript
+// Client-side encryption using FHEVM SDK
+const encryptedVote = await instance
+  .createEncryptedInput(contractAddress, userAddress)
+  .add32(candidateId)  // Candidate selection (0-3)
+  .encrypt();
+
+// Submit encrypted vote to blockchain
+await contract.vote(encryptedVote.handles[0], encryptedVote.inputProof);
+```
+
+#### Homomorphic Vote Counting
+
+```solidity
+// On-chain homomorphic operations
+function updateVoteCount(euint32 candidate, euint32 currentCount) internal {
+    euint32 one = FHE.asEuint32(1);
+    ebool isSelectedCandidate = FHE.eq(candidate, FHE.asEuint32(targetId));
+    return FHE.select(isSelectedCandidate, FHE.add(currentCount, one), currentCount);
+}
+```
+
+#### Permission-Based Decryption
+
+```solidity
+// Grant decryption permissions
+function authorizeUserForDecryption(address user) external {
+    FHE.allow(voteData.candidate1Votes, user);
+    FHE.allow(voteData.candidate2Votes, user);
+    // ... for all vote counts
+}
+```
+
+### Gas Optimization Strategies
+
+- **Efficient FHE Operations**: Minimize homomorphic computations per vote
+- **Batch Processing**: Group encryption/decryption operations
+- **Storage Optimization**: Compact encrypted data structures
+- **Permission Caching**: Minimize repeated authorization calls
+
+### Performance Characteristics
+
+- **Vote Latency**: ~15-30 seconds (includes encryption + blockchain confirmation)
+- **Result Updates**: Real-time encrypted counts, instant decryption for authorized users
+- **Scalability**: Supports thousands of votes with homomorphic efficiency
+- **Network Compatibility**: Works on Ethereum mainnet, testnets, and local networks
+
+## 🧪 Testing Strategy
+
+### Test Coverage Areas
+
+#### Unit Tests (`test/CommunityVoting.ts`)
+- ✅ Contract initialization and setup
+- ✅ Individual vote casting functionality
+- ✅ Vote counting accuracy
+- ✅ Double-vote prevention
+- ✅ Input validation and error handling
+- ✅ Authorization and permission systems
+
+#### Integration Tests (`test/CommunityVotingSepolia.ts`)
+- ✅ Multi-user voting scenarios
+- ✅ Sepolia testnet deployment verification
+- ✅ Real FHEVM relayer interactions
+- ✅ Cross-user authorization flows
+- ✅ Large-scale voting simulations
+
+### Test Execution
+
+```bash
+# Run all local tests
+npm test
+
+# Run Sepolia integration tests
+npm run test:sepolia
+
+# Generate coverage reports
+npm run coverage
+```
+
+### Continuous Integration
+
+The project includes comprehensive CI/CD pipelines that:
+- Run full test suites on every commit
+- Verify contract deployments on testnets
+- Perform security audits and gas analysis
+- Maintain >90% code coverage requirements
+
+## 🚀 Deployment Guide
+
+### Local Development
+
+1. **Start Hardhat Node**:
+   ```bash
+   npx hardhat node
+   ```
+
+2. **Deploy Contracts**:
+   ```bash
+   npm run deploy:localhost
+   ```
+
+3. **Update Frontend Config**:
+   ```typescript
+   // ui/src/config/env.ts
+   export const CONTRACT_ADDRESS_LOCALHOST = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+   ```
+
+4. **Start Frontend**:
+   ```bash
+   cd ui && npm run dev
+   ```
+
+### Sepolia Testnet Deployment
+
+1. **Configure Environment**:
+   ```bash
+   npx hardhat vars setup
+   # Set PRIVATE_KEY and INFURA_API_KEY
+   ```
+
+2. **Deploy to Sepolia**:
+   ```bash
+   npx hardhat deploy --network sepolia
+   ```
+
+3. **Update Frontend Config**:
+   ```typescript
+   // ui/src/config/env.ts
+   export const CONTRACT_ADDRESS_SEPOLIA = "0x118D66433E901268f44c8C4cB4A6F14f0745A572";
+   ```
+
+4. **Verify Deployment**:
+   ```bash
+   npx hardhat verify --network sepolia <CONTRACT_ADDRESS>
+   ```
+
+### Production Deployment
+
+1. **Mainnet Deployment**:
+   ```bash
+   npx hardhat deploy --network mainnet
+   ```
+
+2. **Contract Verification**:
+   ```bash
+   npx hardhat verify --network mainnet <CONTRACT_ADDRESS>
+   ```
+
+3. **Frontend Deployment** (Vercel):
+   ```bash
+   cd ui
+   npm run build
+   npm run preview  # Test production build
+   # Deploy via Vercel CLI or GitHub integration
+   ```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### FHEVM Connection Problems
+```bash
+# Check FHEVM relayer status
+curl https://devnet.zama.ai
+
+# Restart local Hardhat node
+npx hardhat node
+
+# Clear cache and rebuild
+npm run clean && npm run compile
+```
+
+#### Wallet Connection Issues
+- Ensure MetaMask is connected to correct network
+- Check wallet permissions and approvals
+- Verify sufficient test ETH balance
+
+#### Vote Submission Failures
+- Confirm contract is deployed and accessible
+- Check FHEVM SDK initialization
+- Verify candidate ID is within valid range (0-3)
+- Ensure user hasn't already voted
+
+#### Decryption Problems
+- Confirm user is authorized for decryption
+- Check FHEVM relayer connectivity
+- Verify signature validity and timestamps
+
+### Debug Commands
+
+```bash
+# Check contract deployment status
+npx hardhat deployments
+
+# View vote counts (encrypted)
+npx hardhat voting:getCounts --network localhost
+
+# Check voting status for address
+npx hardhat voting:checkHasVoted --network localhost --address 0x...
+
+# Authorize user for decryption
+npx hardhat voting:authorize --network localhost --user 0x...
+```
+
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
@@ -416,6 +670,21 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - Code coverage maintained above 90%
 - Linting passes: `npm run lint`
 - Manual testing on both local and Sepolia networks
+- Integration tests for new features
+
+### Code Style Guidelines
+
+- **Solidity**: Follow OpenZeppelin and FHEVM best practices
+- **TypeScript**: Strict type checking enabled
+- **React**: Functional components with hooks
+- **Styling**: Tailwind CSS with consistent design tokens
+
+### Security Considerations
+
+- Never commit private keys or sensitive data
+- Use environment variables for configuration
+- Follow principle of least privilege
+- Test thoroughly before production deployment
 
 ## 📄 License
 
